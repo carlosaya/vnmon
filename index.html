@@ -60,7 +60,7 @@
 			lastUpdated = ""
 			$.ajax({
 				dataType: "json",
-				url: "https://carlosaya.github.io/vnmon/data.json",
+				url: "https://carlosaya.github.io/vnmon/data.json?nocahce=" + (new Date()).getTime(),
 				async: false,
 				success: function (data) {
 					dates = data.dates;
