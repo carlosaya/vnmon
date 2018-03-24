@@ -64,6 +64,7 @@ echo "{\"lastUpdated\": \"$(date)\", \"dates\": $(echo $jsonDates), \"rx\": $(ec
 vnstat -h | grep "^[0-9][0-9].*" > /var/www/htdocs/vnmon/hourly.txt
 
 cd /var/www/htdocs/vnmon/
+git pull
 git add .
 git commit -m '5m auto-update'
 git push
