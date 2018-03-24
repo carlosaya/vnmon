@@ -59,6 +59,13 @@ echo $rxArr
 echo $txArr
 echo $toArr
 
-echo "{\"lastUpdated\": \"$(date)\", \"dates\": $(echo $jsonDates), \"rx\": $(echo $rxArr), \"tx\": $(echo $txArr), \"to\": $(echo $toArr)}" > /var/www/htdocs/vnstat/data.json
+echo "{\"lastUpdated\": \"$(date)\", \"dates\": $(echo $jsonDates), \"rx\": $(echo $rxArr), \"tx\": $(echo $txArr), \"to\": $(echo $toArr)}" > /var/www/htdocs/vnmon/data.json
 
-vnstat -h | grep "^[0-9][0-9].*" > /var/www/htdocs/vnstat/hourly.txt
+vnstat -h | grep "^[0-9][0-9].*" > /var/www/htdocs/vnmon/hourly.txt
+
+cd /var/www/htdocs/vnmon/
+git add .
+git commit -m '5m auto-update'
+git push
+
+
