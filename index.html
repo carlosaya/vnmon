@@ -8,7 +8,7 @@
 	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>	
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
-	<script src="https://carlosaya.github.io/vnmon/utils.js"></script>
+	<script src="./utils.js"></script>
 	<script type="text/javascript" src="./moment.js"></script>
 	<style>
 		@media (max-width: 1500px) {
@@ -60,7 +60,7 @@
 			lastUpdated = ""
 			$.ajax({
 				dataType: "json",
-				url: "https://carlosaya.github.io/vnmon/data.json?nocahce=" + (new Date()).getTime(),
+				url: "./data.json?nocahce=" + (new Date()).getTime(),
 				async: false,
 				success: function (data) {
 					dates = data.dates;
@@ -85,7 +85,7 @@
 
 			$.ajax({
 				dataType: "text",
-				url: "https://carlosaya.github.io/vnmon/hourly.txt",
+				url: "./hourly.txt",
 				async: false,
 				success: function (data) {
 								
