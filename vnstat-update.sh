@@ -1,6 +1,15 @@
 #/bin/bash
 cd /config/scripts/vnmon/
+
 git pull
+
+mkdir vnstat-data
+currenttime=$(date +%H:%M)
+if [[ "$currenttime" = "06:20" ]]; then
+	cp -Rf /var/log/vnstat ./vnstat-data
+fi
+
+
 jsonDates=$(vnstat -d | grep -Eo "([0-9]{2}\/[0-9]{2}\/[0-9]{2})" | jq -R '[.]' | jq -s -c 'add')
 
 dates=$(vnstat -d | grep -Eo "([0-9]{2}\/[0-9]{2}\/[0-9]{2})")
