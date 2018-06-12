@@ -133,7 +133,7 @@
 					month = entry.date.split('/')[0];
 					day = entry.date.split('/')[1];
 
-					if (currentDay > 12) {
+					if (currentDay >= 12) {
 						startMonth = currentMonth;
 						endMonth = currentMonth + 1
 					} else {
