@@ -106,7 +106,11 @@ for entry in hourlyData:
         ddb.update_item(
             TableName = 'vnmon-daily',
             Key = {'date': {'S':date}},
-            UpdateExpression = 'SET tx{0} = :txval, rx{1} = :rxval'.format(entry['hour'], entry['hour']),
+            UpdateExpression = 'SET #tx = :txval, #rx = :rxval',
+            ExpressionAttributeNames = {
+                "#tx": "{0}tx".format(str(entry['hour'])),
+                "#rx": "{0}rx".format(str(entry['hour']))
+            },
             ExpressionAttributeValues = {
                 ":txval": {'N': entry['tx']},
                 ":rxval": {'N': entry['rx']}
