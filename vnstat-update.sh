@@ -3,6 +3,8 @@ cd /config/scripts/vnmon/
 
 git pull
 
+python ./vnstat-update.py
+
 mkdir vnstat-data
 currenttime=$(date +%H:%M)
 if [[ "$currenttime" = "06:20" ]]; then
