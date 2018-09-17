@@ -65,13 +65,14 @@ for date in dates:
         if item['date']['S'] == date:
             match = True
     if not match or date == today:
-        ddb.put_item(
+        ddb.update_item(
             TableName = 'vnmon-daily',
-            Item = {
-                'date': {'S': date},
-                'rx': {'N': str(rxVal)},
-                'tx': {'N': str(txVal)},
-                'to': {'N': str(toVal)}
+            Key = {'date': {'S':date}},
+            UpdateExpression = 'SET tx = :txval, rx = :rxval, to = :toval',
+            ExpressionAttributeValues = {
+                ":txval": {'N': txval},
+                ":rxval": {'N': rxval},
+                ":toval": {'N': toval},
             }
         )
 
