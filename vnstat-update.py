@@ -68,11 +68,16 @@ for date in dates:
         ddb.update_item(
             TableName = 'vnmon-daily',
             Key = {'date': {'S':date}},
-            UpdateExpression = 'SET tx = :txval, rx = :rxval, to = :toval',
+            UpdateExpression = 'SET #tx = :txval, #rx = :rxval, #to = :toval',
+            ExpressionAttributeNames = {
+		"#to": "to",
+		"#tx": "tx",
+		"#rx": "rx"
+            },
             ExpressionAttributeValues = {
-                ":txval": {'N': txVal},
-                ":rxval": {'N': rxVal},
-                ":toval": {'N': toVal},
+                ":txval": {'N': str(txVal)},
+                ":rxval": {'N': str(rxVal)},
+                ":toval": {'N': str(toVal)},
             }
         )
 
