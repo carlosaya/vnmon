@@ -70,9 +70,9 @@ for date in dates:
             Key = {'date': {'S':date}},
             UpdateExpression = 'SET tx = :txval, rx = :rxval, to = :toval',
             ExpressionAttributeValues = {
-                ":txval": {'N': txval},
-                ":rxval": {'N': rxval},
-                ":toval": {'N': toval},
+                ":txval": {'N': txVal},
+                ":rxval": {'N': rxVal},
+                ":toval": {'N': toVal},
             }
         )
 
