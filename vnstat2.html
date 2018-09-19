@@ -95,8 +95,9 @@
 					hours.forEach(hour => {
 						hourlyRx.push(hourlyData[hour].rx);
 						hourlyTx.push(hourlyData[hour].tx);
-						previous24Hrs = previous24Hrs + hourlyData[hour].rx + hourlyData[hour].tx;
+						previous24Hrs += hourlyData[hour].rx + hourlyData[hour].tx;
 					});
+					console.log("previous 24 Hours\t" + previous24Hrs);
 				}
 			});
 
