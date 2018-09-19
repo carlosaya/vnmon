@@ -1,16 +1,22 @@
 import boto3
 import subprocess
 import re
-import datetime
+from datetime import *
+import dateutil.tz
 
-now = datetime.datetime.now()
-month = now.strftime('%m')
-day = now.strftime('%d')
-year = now.strftime('%y')
+offset = dateutil.tz.tzoffset(None, 10*60*60)
+offsetLastHour = dateutil.tz.tzoffset(None, 10*60*60 - 3600)
+
+now = datetime.now(offset)
 today = now.strftime('%m/%d/%y')
-yesterday = "{0}/{1}/{2}".format(month,int(day)-1,year)
-currentHour = now.strftime('%H')
-lastHour = str(int(currentHour) - 1)
+yesterday = (now - timedelta(1)).strftime('%m/%d/%y')
+
+month = str(now.month).zfill(2)
+day = str(now.day).zfill(2)
+year = now.year
+
+currentHour = str(now.hour).zfill(2)
+lastHour = str(datetime.now(offsetLastHour).hour).zfill(2)
 
 command = 'vnstat -d'
 process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
@@ -102,12 +108,11 @@ for line in lines:
 hourlyData = hourlyData1 + hourlyData2 + hourlyData3
 for entry in hourlyData:
     date = None
-    if entry['hour'] == currentHour:
+    if entry['hour'] <= currentHour:
         date = today
-    elif entry['hour'] == lastHour:
-        date = today
-    elif currentHour == 00 and entry['hour'] == 23:
+    else:
         date = yesterday
+
     if date:
         ddb.update_item(
             TableName = 'vnmon-daily',
