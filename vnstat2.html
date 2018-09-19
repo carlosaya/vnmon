@@ -105,34 +105,6 @@
 				currentMonth = (new Date()).getMonth() + 1;
 				currentDay = (new Date()).getDate();
 
-/*				total = 0
-				txData = [];
-				rxData = [];
-				dates = [];
-				myData.forEach(entry => {
-					month = entry.date.split('/')[0];
-					day = entry.date.split('/')[1];
-
-					if (currentDay >= 12) {
-						startMonth = currentMonth;
-						endMonth = currentMonth + 1
-					} else {
-						startMonth = currentMonth - 1;
-						endMonth = currentMonth
-					}
-
-					if ( ((month == startMonth) && (day >= 12)) || (month > startMonth)) {
-						total += entry.to;
-						console.log("Adding data from " + entry.date);
-						dates.push(entry.date);
-						rxData.push(entry.rx);
-						txData.push(entry.tx);
-					}
-					
-				}); 
-
-				percent = Math.round((total * 100)/140);
-*/
 				var elem = document.getElementById("datacap"); 
 				
 				elem.style.width = percent + '%';
@@ -240,18 +212,7 @@
 				tr2.appendChild(document.createElement('td'));
 				tr2.cells[0].appendChild(document.createTextNode((previous24Hrs/(1024*1024)).toFixed(2) + " GB"));
 				tr2.cells[1].appendChild(document.createTextNode(total.toFixed(2) + " GB"));
-				dailyAvg = (total/dates.length).toFixed(2)
 				tr2.cells[2].appendChild(document.createTextNode(dailyAvg + " GB"));
-				/*
-				if (endMonth.toString().length == 1) {
-					endMonth = "0" + endMonth.toString();
-				}
-				console.log(endMonth);
-				cycleDate = moment("2018-" + endMonth + "-12");
-				console.log(cycleDate);
-				today = moment().format("YYYY-MM-DD");
-				console.log(today);
-				daysRemaining = cycleDate.diff(today, "days"); */
 				tr2.cells[3].appendChild(document.createTextNode(daysRemaining));
 				tr2.cells[4].appendChild(document.createTextNode((total + daysRemaining*dailyAvg).toFixed(2) + " GB"));
 
