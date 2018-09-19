@@ -1,0 +1,270 @@
+<!doctype html>
+<html>
+
+<head>
+	<title>Bar Chart</title>
+	<!-- <script src="../../../dist/Chart.bundle.js"></script> -->
+	
+	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+	<script src="./utils.js"></script>
+	<script type="text/javascript" src="./moment.js"></script>
+	<style>
+		@media (max-width: 1500px) {
+			body {
+				float: none;
+				width: 100%;
+			}
+		}
+		body {
+			margin-left: 10%;
+			margin-right: 10%;
+		}
+		canvas {
+			-moz-user-select: none;
+			-webkit-user-select: none;
+			-ms-user-select: none;
+		}
+	</style>
+</head>
+
+<body>
+	<br>
+	<div class="w3-container" style="width: 75%; align-content: center;">
+		
+	</div>
+	<div class="w3-light-grey" style="width: 75%;">
+		<div id="datacap" class="w3-container w3-blue w3-center" style="height:24px;width:1%">1%</div>
+	</div>
+	<br><br>
+	
+	<div class="w3-container" style="width: 75%;">
+		<center><div id="summary"></div></center>
+	</div>
+
+<br>
+	<div id="container" style="width: 75%; align-content: center;">
+		<canvas id="canvas"></canvas>
+	</div>
+<br><br>
+	<div id="container2" style="width: 75%; align-content: center;">
+		<canvas id="canvas2"></canvas>
+	</div>
+	<br><br>
+	<script>
+			total = ""
+			dates = ""
+			txData = ""
+			rxData = ""
+			lastUpdated = ""
+			$.ajax({
+				dataType: "json",
+				url: "https://ygdng8s036.execute-api.ap-southeast-2.amazonaws.com/Prod",
+				async: false,
+				success: function (data) {
+					dates = data.daily.dates;
+					txData = data.daily.tx;
+					rxData = data.daily.rx;
+					toData = data.daily.to;
+          hourlyData = data.hourly;
+          
+          percent = data.percent;
+          total = data.total;
+          dailyAvg = data.dailyAvg;
+          daysRemaining = data.daysRemaining;
+					lastUpdated = data.lastUpdated;
+          
+
+					myData = new Array();
+					i = 0;
+					dates.forEach(date => {
+						object = {};
+						object.date = dates[i];
+						object.rx = rxData[i];
+						object.tx = txData[i];
+						object.to = object.rx + object.tx;
+						myData.push(object);
+						i += 1;
+					});
+          
+          hours = hourlyData.hours;
+					hourlyRx = [];
+					hourlyTx = [];
+					previous24Hrs = 0;
+					hours.forEach(hour => {
+						hourlyRx.push(hourlyData[hour].rx);
+						hourlyTx.push(hourlyData[hour].tx);
+						previous24Hrs = previous24Hrs + hourlyData[hour].rx + hourlyData[hour].tx;
+					});
+				}
+			});
+
+			window.onload = function() {
+				console.log(JSON.stringify(myData));
+				currentMonth = (new Date()).getMonth() + 1;
+				currentDay = (new Date()).getDate();
+
+/*				total = 0
+				txData = [];
+				rxData = [];
+				dates = [];
+				myData.forEach(entry => {
+					month = entry.date.split('/')[0];
+					day = entry.date.split('/')[1];
+
+					if (currentDay >= 12) {
+						startMonth = currentMonth;
+						endMonth = currentMonth + 1
+					} else {
+						startMonth = currentMonth - 1;
+						endMonth = currentMonth
+					}
+
+					if ( ((month == startMonth) && (day >= 12)) || (month > startMonth)) {
+						total += entry.to;
+						console.log("Adding data from " + entry.date);
+						dates.push(entry.date);
+						rxData.push(entry.rx);
+						txData.push(entry.tx);
+					}
+					
+				}); 
+
+				percent = Math.round((total * 100)/140);
+*/
+				var elem = document.getElementById("datacap"); 
+				
+				elem.style.width = percent + '%';
+				elem.innerHTML = total.toFixed(2) + ' GB / 140 GB (' + percent + "%)";
+					
+				var color = Chart.helpers.color;
+				var barChartData = {
+					labels: dates,
+					datasets: [{
+						label: 'Rx',
+						backgroundColor: color(window.chartColors.red).alpha(0.5).rgbString(),
+						borderColor: window.chartColors.red,
+						borderWidth: 1,
+						data: rxData
+					}, {
+						label: 'Tx',
+						backgroundColor: color(window.chartColors.blue).alpha(0.5).rgbString(),
+						borderColor: window.chartColors.blue,
+						borderWidth: 1,
+						data: txData
+					}]
+				};
+
+				var ctx = document.getElementById('canvas').getContext('2d');
+				window.myBar = new Chart(ctx, {
+					type: 'bar',
+					data: barChartData,
+					options: {
+						responsive: true,
+						legend: {
+							position: 'top',
+						},
+						title: {
+							display: true,
+							text: "Daily Usage as of " + lastUpdated
+						}
+					}
+				});
+
+				var barChartData2 = {
+					labels: hours,
+					datasets: [{
+						label: 'Rx',
+						backgroundColor: color(window.chartColors.red).alpha(0.5).rgbString(),
+						borderColor: window.chartColors.red,
+						borderWidth: 1,
+						data: hourlyRx
+					}, {
+						label: 'Tx',
+						backgroundColor: color(window.chartColors.blue).alpha(0.5).rgbString(),
+						borderColor: window.chartColors.blue,
+						borderWidth: 1,
+						data: hourlyTx
+					}]
+				};
+
+				var ctx = document.getElementById('canvas2').getContext('2d');
+				window.myBar = new Chart(ctx, {
+					type: 'bar',
+					data: barChartData2,
+					options: {
+						responsive: true,
+						legend: {
+							position: 'top',
+						},
+						title: {
+							display: true,
+							text: "Last 24 Hours Usage"
+						}
+					}
+				});
+
+				var tablearea = document.getElementById('summary'),
+					table = document.createElement('table'),
+					tr = document.createElement('tr'),
+					tr2 = document.createElement('tr');
+
+				table.style['width'] = '100%';
+				table.style['border-collapse'] = 'collapse';
+				table.style['border'] = "1px solid #ddd";
+				table.style['padding'] = '8px';
+				tr.style['border'] = "1px solid #ddd";
+				tr.style['padding'] = '8px';
+				tr.style['text-align'] = 'left';
+				tr2.style['border'] = "1px solid #ddd";
+				tr2.style['padding'] = '8px';
+				tr2.style['text-align'] = 'left';
+				
+				tr.appendChild( document.createElement('th') );
+				tr.appendChild( document.createElement('th') );
+				tr.appendChild( document.createElement('th') );
+				tr.appendChild( document.createElement('th') );
+				tr.appendChild( document.createElement('th') );
+				tr.cells[0].appendChild( document.createTextNode('Last 24hrs') );
+				tr.cells[1].appendChild( document.createTextNode('Current Total') );
+				tr.cells[2].appendChild( document.createTextNode('Daily Avg') );
+				tr.cells[3].appendChild( document.createTextNode('Days Left') );
+				tr.cells[4].appendChild( document.createTextNode('Pace') );
+				
+				
+				tr2.appendChild(document.createElement('td'));
+				tr2.appendChild(document.createElement('td'));
+				tr2.appendChild(document.createElement('td'));
+				tr2.appendChild(document.createElement('td'));
+				tr2.appendChild(document.createElement('td'));
+				tr2.cells[0].appendChild(document.createTextNode((previous24Hrs/(1024*1024)).toFixed(2) + " GB"));
+				tr2.cells[1].appendChild(document.createTextNode(total.toFixed(2) + " GB"));
+				dailyAvg = (total/dates.length).toFixed(2)
+				tr2.cells[2].appendChild(document.createTextNode(dailyAvg + " GB"));
+				/*
+				if (endMonth.toString().length == 1) {
+					endMonth = "0" + endMonth.toString();
+				}
+				console.log(endMonth);
+				cycleDate = moment("2018-" + endMonth + "-12");
+				console.log(cycleDate);
+				today = moment().format("YYYY-MM-DD");
+				console.log(today);
+				daysRemaining = cycleDate.diff(today, "days"); */
+				tr2.cells[3].appendChild(document.createTextNode(daysRemaining));
+				tr2.cells[4].appendChild(document.createTextNode((total + daysRemaining*dailyAvg).toFixed(2) + " GB"));
+
+				table.appendChild(tr);
+				table.appendChild(tr2);
+
+				tablearea.appendChild(table);
+			};
+
+
+			var colorNames = Object.keys(window.chartColors);
+			
+	</script>
+</body>
+
+</html>
