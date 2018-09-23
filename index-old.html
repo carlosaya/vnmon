@@ -60,21 +60,14 @@
 			lastUpdated = ""
 			$.ajax({
 				dataType: "json",
-				url: "https://ygdng8s036.execute-api.ap-southeast-2.amazonaws.com/Prod",
+				url: "./data.json?nocahce=" + (new Date()).getTime(),
 				async: false,
 				success: function (data) {
-					dates = data.daily.dates;
-					txData = data.daily.tx;
-					rxData = data.daily.rx;
-					toData = data.daily.to;
-          hourlyData = data.hourly;
-          
-          percent = data.percent;
-          total = data.total;
-          dailyAvg = data.dailyAvg;
-          daysRemaining = data.daysRemaining;
+					dates = data.dates;
+					txData = data.tx;
+					rxData = data.rx;
+					toData = data.to;
 					lastUpdated = data.lastUpdated;
-          
 
 					myData = new Array();
 					i = 0;
@@ -83,28 +76,82 @@
 						object.date = dates[i];
 						object.rx = rxData[i];
 						object.tx = txData[i];
-						object.to = object.rx + object.tx;
+						object.to = toData[i];
 						myData.push(object);
 						i += 1;
 					});
-          
-          hours = hourlyData.hours;
+				}
+			});
+
+			$.ajax({
+				dataType: "text",
+				url: "./hourly.txt",
+				async: false,
+				success: function (data) {
+								
+					hourlyData1 = [];
+					hourlyData2 = [];
+					hourlyData3 = [];
+					
+					lines = data.split('\n')
+					lines.forEach(line => {
+						if (line != '') {
+							split = line.split(/\s+/);
+							hourlyData1.push({"hour": split[0], "rx": split[1], "tx": split[2]});
+							hourlyData2.push({"hour": split[3], "rx": split[4], "tx": split[5]});
+							hourlyData3.push({"hour": split[6], "rx": split[7], "tx": split[8]});
+						}
+					});
+
+					hourlyData = hourlyData1.concat(hourlyData2, hourlyData3);
+					
+					hours = [];
 					hourlyRx = [];
 					hourlyTx = [];
 					previous24Hrs = 0;
-					hours.forEach(hour => {
-						hourlyRx.push(hourlyData[hour].rx);
-						hourlyTx.push(hourlyData[hour].tx);
-						previous24Hrs += parseInt(hourlyData[hour].rx) + parseInt(hourlyData[hour].tx);
+					hourlyData.forEach(entry => {
+						hours.push(entry.hour);
+						hourlyRx.push(entry.rx);
+						hourlyTx.push(entry.tx);
+						previous24Hrs = previous24Hrs + parseFloat(entry.rx) + parseFloat(entry.tx);
 					});
-					console.log("previous 24 Hours\t" + previous24Hrs);
 				}
+				
+
 			});
 
 			window.onload = function() {
 				console.log(JSON.stringify(myData));
 				currentMonth = (new Date()).getMonth() + 1;
 				currentDay = (new Date()).getDate();
+
+				total = 0
+				txData = [];
+				rxData = [];
+				dates = [];
+				myData.forEach(entry => {
+					month = entry.date.split('/')[0];
+					day = entry.date.split('/')[1];
+
+					if (currentDay > 12) {
+						startMonth = currentMonth;
+						endMonth = currentMonth + 1
+					} else {
+						startMonth = currentMonth - 1;
+						endMonth = currentMonth
+					}
+
+					if ( ((month == startMonth) && (day >= 12)) || (month > startMonth)) {
+						total += entry.to;
+						console.log("Adding data from " + entry.date);
+						dates.push(entry.date);
+						rxData.push(entry.rx);
+						txData.push(entry.tx);
+					}
+					
+				});
+
+				percent = Math.round((total * 100)/140);
 
 				var elem = document.getElementById("datacap"); 
 				
@@ -213,7 +260,18 @@
 				tr2.appendChild(document.createElement('td'));
 				tr2.cells[0].appendChild(document.createTextNode((previous24Hrs/(1024*1024)).toFixed(2) + " GB"));
 				tr2.cells[1].appendChild(document.createTextNode(total.toFixed(2) + " GB"));
+				dailyAvg = (total/dates.length).toFixed(2)
 				tr2.cells[2].appendChild(document.createTextNode(dailyAvg + " GB"));
+				
+				if (endMonth.toString().length == 1) {
+					endMonth = "0" + endMonth.toString();
+				}
+				console.log(endMonth);
+				cycleDate = moment("2018-" + endMonth + "-12");
+				console.log(cycleDate);
+				today = moment().format("YYYY-MM-DD");
+				console.log(today);
+				daysRemaining = cycleDate.diff(today, "days");
 				tr2.cells[3].appendChild(document.createTextNode(daysRemaining));
 				tr2.cells[4].appendChild(document.createTextNode((total + daysRemaining*dailyAvg).toFixed(2) + " GB"));
 
