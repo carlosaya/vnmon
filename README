@@ -1,0 +1,20 @@
+1. https://community.ubnt.com/t5/EdgeMAX-CLI-Basics-Knowledge/EdgeMAX-Add-other-Debian-packages-to-Edge...
+
+2. sudo apt-get update
+
+3. sudo apt-get install vnstat vnstati
+
+4. vnstat -u -i eth0 ( or any other interface you need )
+
+5. /etc/init.d/vnstat start
+
+
+To ensure vnstat starts on boot run this on the command line:
+ 
+    ln -s /etc/init.d/vnstat /config/scripts/post-config.d/vnstat
+
+Add the following to /config/scripts/post-config.d/vnstat:
+
+    if [ ! -d /var/log/vnstat ]; then mkdir -p /var/log/vnstat; cp /config/scripts/vnmon/vnstat-data/vnstat/* -R /var/log/vnstat; fi
+
+
