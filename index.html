@@ -109,7 +109,7 @@
 				var elem = document.getElementById("datacap"); 
 				
 				elem.style.width = percent + '%';
-				elem.innerHTML = total.toFixed(2) + ' GB / 200 GB (' + percent + "%)";
+				elem.innerHTML = percent + '% (' + total.toFixed(2) + ' GB / 200 GB)';
 					
 				var color = Chart.helpers.color;
 				var barChartData = {
