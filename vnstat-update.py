@@ -47,7 +47,9 @@ ddbItems = ddb.batch_get_item(
 for date in dates:
     data = re.findall("%s.*" % date, output)
     line = re.findall("%s.*" % date, output)
-    data = re.findall("\d*\.\d{2} .iB", line[0])    
+    data = re.findall("\d*\.\d{2} .iB", line[0])
+    if len(data) == 0:
+        continue 
     txUnit = re.search(".iB", data[1]).group(0)
     toUnit = re.search(".iB", data[2]).group(0)
     txVal = data[1].split(' ')[0]
